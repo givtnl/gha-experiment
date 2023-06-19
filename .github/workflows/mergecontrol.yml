@@ -11,4 +11,4 @@ jobs:
         if: ${{ github.event.pull_request.base.ref }} == 'main'
         steps:
         - uses: superbrothers/close-pull-request@v3
-          if: ${{ github.event.pull_request.head.ref }} != 'develop'
+          if: ${{ github.event.pull_request.head.ref }} != 'develop' && contains(hotfix, ${{ github.event.pull_request.title }}) == false
