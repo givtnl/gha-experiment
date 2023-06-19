@@ -1,46 +1,17 @@
 name: Merge gatekeeping
 
 on:
-  pull_request:
+  pull_request_target:
     types:
-        - closed
+        - opened
+    branches:
+        - main
 
 jobs:
     merge_gatekeeper:
         runs-on: ubuntu-latest
-
+        if: ${{ github.event.pull_request.head.ref }} != 'develop' && contains(hotfix, ${{ github.event.pull_request.title }}) == false
         steps:
-            - name: checkout repository
-              uses: actions/checkout@v2
-
-            - name: check merge rules
-              run: |
-                echo "NOMERGE=FALSE" >> $GITHUB_ENV
-                sleep 5
-                echo "${{ github.event.pull_request.base.ref }} merging from ${{ github.event.pull_request.head.ref }}"
-                echo "pr name is ${{ github.ref }}"
-                export REPONAMECLEAN=`echo "${{ github.repository }}" | sed "s/'//g"`
-                if [ "${{ github.event.pull_request.base.ref }}" == "main" ] && [ "${{ github.event.pull_request.head.ref }}" != "develop" ]
-                then
-                  echo "Merging to main from a branch other than develop should not happen!"
-                  echo "NOMERGE=TRUE" >> $GITHUB_ENV
-                  echo "NOTIFY='Illegal push to main branch on $REPONAMECLEAN, build & deployment have been cancelled, please resolve.'"
-                  if [ ${{ contains('hotfix', github.ref) }} ]
-                  then
-                    echo "NOMERGE=FALSE" >> $GITHUB_ENV
-                    echo "NOTIFY='Illegal push to main branch on $REPONAMECLEAN, build & deployment have NOT been cancelled due to hotfix. Please merge main into dev if this deploy is a success.'" >> $GITHUB_ENV
-                    echo "nomerge is false"
-                    exit 0
-                  fi
-                  echo "nomerge is true"
-                fi
-                exit 0
-
-            - name: Kill running jobs
-              if: contains(${{ env.NOMERGE }}, 'true')
-              uses: styfle/cancel-workflow-action@0.9.1
-
-            - name: Slack notify example
-              if: ${{ env.NOTIFY == 'true'}}
-              run: |
-                echo $NOTIFY
+        - uses: superbrothers/close-pull-request@v3
+          with:
+            comment: "Canceled because this does not follow the merge strategy. If this is a hotfix, add the term hotfix in the title of the merge to bypass this check."
