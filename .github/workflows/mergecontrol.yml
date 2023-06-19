@@ -17,7 +17,7 @@ jobs:
               run: |
                 echo "NOMERGE=FALSE" >> $GITHUB_ENV
                 sleep 5
-                echo "${{ github.repository }}" | sed "s/'//g" >> $REPONAMECLEAN
+                export REPONAMECLEAN=`echo "${{ github.repository }}" | sed "s/'//g"`
                 if [ "${{ github.event.pull_request.base.ref }}" == "main" ] && [ "${{ github.event.pull_request.head.ref }}" != "develop" ]
                   echo "Merging to main from a branch other than develop should not happen!"
                   echo "NOMERGE=TRUE" >> $GITHUB_ENV
