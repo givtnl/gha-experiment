@@ -18,11 +18,11 @@ jobs:
                 echo "NOMERGE=FALSE" >> $GITHUB_ENV
                 sleep 5
                 export REPONAMECLEAN=`echo "${{ github.repository }}" | sed "s/'//g"`
-                if [ "${{ github.event.pull_request.base.ref }}" == "main" ] && [ "${{ github.event.pull_request.head.ref }}" != "develop" ]
+                if [ "${{ github.event.pull_request.base.ref }}" == "main" ] && [ "${{ github.event.pull_request.head.ref }}" != "develop" ] then
                   echo "Merging to main from a branch other than develop should not happen!"
                   echo "NOMERGE=TRUE" >> $GITHUB_ENV
                   echo "NOTIFY='Illegal push to main branch on $REPONAMECLEAN, build & deployment have been cancelled, please resolve.'"
-                  if [ ${{ contains('hotfix', github.ref) }} ]
+                  if [ ${{ contains('hotfix', github.ref) }} ] then
                     echo "NOMERGE=FALSE" >> $GITHUB_ENV
                     echo "NOTIFY='Illegal push to main branch on $REPONAMECLEAN, build & deployment have NOT been cancelled due to hotfix. Please merge main into dev if this deploy is a success.'" >> $GITHUB_ENV
                   fi
