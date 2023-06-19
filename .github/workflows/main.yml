@@ -9,8 +9,7 @@ jobs:
   simulate-build:
     runs-on: ubuntu latest
     steps:
-      - name: simulate 2 minutes of building
-        run: sleep 120
-
-      - name: simulate 2 minutes of testing
-        run: sleep 120
+      - name: simulate building
+        run: |
+          sleep 10
+          echo "done building"
